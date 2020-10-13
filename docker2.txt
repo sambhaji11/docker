@@ -1,0 +1,355 @@
+Basic
+: docker version
+: docker -v 
+: docker --version 
+: docker info
+: docker --help
+: docker login
+
+————————————
+Images
+: docker images                        To list the images
+: docker images ls                     To list the images
+: docker pull                          To pull tha image
+: docker rmi                           To remove one or more iamges
+: docker rmi $(docker images -q)       To remove all images
+
+————————————
+Containers
+: docker ps                                                 shows only running cotainers(use -a for show all containers))
+: docker ps -a                                              shows all containers
+: docker rm <container-name>                                remove one or more containers
+: docker rm $(docker ps -a -q)                              remove all containers
+: docker run <image-name>                                   create a container from image (first time used to container)
+: docker run -d <image-name>                                create a container from image in detached mode
+: docker run -it <image-name> bash                          create a container from image in interactive mode terminal
+: docker start -i <container-name>                          To start the stoped container
+: docker stop <container-name>                              To stop running container
+: docker logs <container-name>                              To sess logs of contianer
+: docker exec -it <container-name> bash                     To interact with container
+: docker run --name a-centos -it centos bash                container will not be removed on exit
+: docker run --name b-centos --rm -it centos bash           container will be removed on exit
+  
+---------------------------------------------------------------------------------
+web servers :httpd    default port :80
+            :nginx    default port :80
+            :mysql    default port :3306
+            :mongodb  default port :27017  
+
+--port forwadisation
+Example 1
+docker run --name p-mysql -e MYSQL_ROOT_PASSWORD=pass123 -p 3232:3306 -d mysql:5.6
+docker logs p-mysql
+docker exec -it p-mysql bash
+#mysql -uroot -ppass123
+
+mysql> show databases
+=========================================================
+Example 2:
+ 
+demo -port forwardisation: 
+$docker run -p 6666:80 -d httpd
+
+docker run --name a-nginx -p  1111:80 -d nginx
+docker run --name b-nginx -p  2222:80 -d nginx
+docker run --name c-nginx -p  3333:80 -d nginx
+
+
+docker exec -it a-nginx bash
+echo "<h1>Hello A-NgInx Server </h1>" > /usr/share/nginx/html/index.html
+
+docker exec -it b-nginx bash
+echo "<h1>Hello B-NgInx Server </h1>" > /usr/share/nginx/html/index.html
+
+docker exec -it c-nginx bash
+echo "<h1>Hello C-NgInx Server </h1>" > /usr/share/nginx/html/index.html
+-----------------------------------------------------------------
+Activity: To create image from running container (docker commit)
+We want to create a simple web application like hello, and people should be able to pull your app from docker hub
+
+step 1:
+docker run --name a-httpd -p 1111:80 -d httpd
+
+step 2:change the contents of html file
+docker exec -it a-httpd bash
+
+echo "<h1>Hello Welcome To Custom Apache Image</h1>" > /usr/local/apache2/htdocs/index.html
+
+--> now refresh the page on 1111 we should get the changes
+-->In case you are running on docker desktop use http://localhost:1111
+
+exit
+
+step 3: commit the changes
+$docker commit -m 'Index File Content Changed' -a 'Chhaya Nikam <chhaya.nikam@gmail.com>' a-httpd chhayanikam01/apache:1.1
+
+--docker login through browser
+username :chhayanikam01
+password :password@123
+
+docker login
+
+docker push chhayanikam01/apache:1.1
+
+---can be run on any machine
+docker run --name b-apache -p 4545:80 -d chhayanikam01/apache:1.1
+-------------------------------------------------------------------------------------------------
+Activity : creating image from scratch (docker build)
+for this we use Dockerfile : 
+A text file with instructions to build image
+Automation of Docker Image Creation
+
+FROM           :Base Image    
+MAINTAINER     :Author Name
+ENV            :Environment variable
+ADD            :ADD the files while buiding the image
+RUN            :To install libraries/packages (executed while building the image)
+ENTRYPOINT     :Executed at run time and we can not override the commands
+CMD            :Executed at run time and we can override by passing command line argument
+
+Step 1 : Create a file named Dockerfile
+Step 2 : Add instructions in Dockerfile
+Step 3 : Build dockerfile to create image
+Step 4 : Run image to create container
+
+Example  :Dockerfile
+Step 1 : Create a file named Dockerfile
+
+$vi Dockerfile
+
+Step 2 : Add instructions in Dockerfile
+copy the below code
+
+FROM ubuntu
+MAINTAINER Chhaya Nikam <chhaya.nikam@gmail.com>
+RUN apt-get update
+
+CMD ["echo", "Hello World..! from my first docker iamge1"]
+CMD ["echo", "Hello World..! from my first docker iamge2"]
+CMD ["echo", "Hello World..! from my first docker iamge3"]
+CMD ["echo", "Hello World..! from my first docker iamge4"]
+
+Note: CMD can be written multiple times but the last one will be called
+
+Step 3 : Build dockerfile to create image
+$ docker build -t chhayanikam01/a-ubuntu:1.1 .
+
+here -t is for tagging image
+dot is for the current dir where Dockerfile is created
+You may createmultiple images from the dockerfile
+
+$ docker build -t b-ubuntu:1.1 .
+
+step 4: you can optionally push the image to docker hub
+docker push chhayanikam01/a-ubuntu:1.1
+
+Note:use docker login in case you are not logged in
+
+step 5:
+docker run chhayanikam01/a-ubuntu:1.1
+
+COMMANDS
+: docker build directoryOfDocekrfile
+: docker build -t ImageName:Tag directoryOfDocekrfile
+: docker run imageid 
+--------------------------------------
+Using ENTRYPOINT
+modify the Dockerfile as below
+
+FROM ubuntu
+MAINTAINER Chhaya Nikam <chhaya.nikam@gmail.com>
+RUN apt-get update
+
+ENTRYPOINT ["echo", "Hello World..! from my first docker iamge1"]
+ENTRYPOINT ["echo", "Hello World..! from my first docker iamge2"]
+ENTRYPOINT ["echo", "Hello World..! from my first docker iamge3"]
+ENTRYPOINT ["echo", "Hello World..! from my first docker iamge4"]
+
+The main difference between CMD and ENTRYPOINT is ENTRYPOINT  allows appending new contents while running docker container
+
+$ docker build -t testentry .
+// optionally if dockerfile name is different give any other filename
+$ docker build -f Somefile -t testentry1 .
+
+$ docker run testentry1
+$ docker run c echo "Hello friends"
+
+CMD and ENTRYPOINT can also used in combinations
+
+-------------------------------------------------
+Example:
+
+Docker file for MYSQL
+=======================
+# Derived from official mysql image (our base image)
+FROM mysql
+# Add a database
+ENV MYSQL_DATABASE company
+ENV MYSQL_ROOT_PASSWORD admin
+ENV MYSQL_USER user1
+ENV MYSQL_PASSWORD password
+# Add the content of the sql-scripts/ directory to your image
+# All scripts in docker-entrypoint-initdb.d/ are automatically
+# executed during container startup
+ADD script.sql /docker-entrypoint-initdb.d/
+
+
+script.sql
+===========
+use company;
+create table employee(id int primary key,name text,salary double);
+insert into employee values(101,'RAM',10000.00);
+insert into employee values(102,'RAHIM',20000.00);
+insert into employee values(103,'DAVID',30000.00);
+insert into employee values(104,'Jack',40000.00);
+
+$ docker build -t p-mysql:5.1 .
+$ docker images
+$docker run --name a-mysql -d p-mysql:5.1
+$docker exec -it a-mysql bash
+#mysql -uroot -padmin
+=========================================
+----------------------------------------------------------------------------------------
+Docker File Spring Boot Java Application
+================================================
+FROM openjdk:8
+ADD target/docker-spring-boot.jar docker-spring-boot.jar
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","docker-spring-boot.jar"]
+
+
+======>
+
+docker build -t chhayanikam01/spring-dokcer-demo:1.1 .
+
+docker login
+
+docker push chhayanikam01/spring-docker-demo:1.1
+
+----------------------------------------------------------------------
+
+
+===========================================
+Example: Commiting the Image in the container (mongodb)
+--------------------------------------------
+--->Downloading the Latest MongoDB Docker Image
+docker pull mongo #Pulls the latest one
+or 
+docker pull mongo:4.0.4 #Pulls the specific version
+
+--->Deploying an Instance of MongoDB as a Container
+docker run --name mongodb mongo:4.0.4
+
+--> To check out on the logs for the image
+docker logs mongodb
+(Displays entire information of the container while starting as well the confirguration details if it has started successfully)
+-->docker start mongodb
+
+--->Interacting with the MongoDB Docker Container with Basic Shell Operations
+docker exec -it mongodb bash
+
+-it: stands for interactive mode
+
+--> To communication with mongodb
+Example: mongo
+
+--> Show databases
+show dbs;
+
+--> To create a database
+use trainingdb;
+
+--> Switch to database
+trainingdb
+
+--> To create a collection
+db.departments.insert({name:'Admin'});
+db.departments.insert({name:'Training'});
+db.departments.insert({name:'Quality'});
+db.departments.insert({name:'HR'});
+
+-->Fetch the data
+trainingdb.departments.find()
+
+--->Modifications can be done and changes commited to container. To commit the changes in container
+docker commit -m 'Created mongodb' -a "chhayanikam<chhaya.nikamg@gmail.com>" 53ef5a2fbda8 my-mongodb:latest
+or
+docker commit 53ef5a2fbda8 my-mongodb:latest
+
+--->To Tag the Image
+docker tag my-mongodb:latest chhayanikam01my-mongodb
+
+--->To Push The Images
+docker push chhayanikam01/my-mongodb
+
+-->view the repository on Docker hub
+https://cloud.docker.com/repository/list
+
+===========================================
+Example: Commiting the Image in the container (mysql)
+--------------------------------------------
+docker run --name my-mysql -it mysql:latest bash
+--Try runnig the command: mysqld --version
+docker login
+docker commit -m "added mysql server" -a "mySQL Image Created" my-mysql lijishynu/my-mysql:latest
+docker push chhayanikam01/my-mysql
+https://cloud.docker.com/repository/list
+	
+------------------------------------------------------------------------------------------
+Session 4
+communicating between containers
+Linking Docker containers with Links
+===========================================
+example: wordpress+mysql linking
+
+Links allow the containers to discover each other and securely transfer the information about one container to another container.
+
+step 1: create a custom bridge network
+docker network create p-network
+
+verify: 
+docker network ls
+
+step 2:
+docker run --name mysql02 --network p-network -e MYSQL_ROOT_PASSWORD=Password1234 -d mysql:5.6
+verify: 
+docker ps
+docker images
+docker inspect p-network
+
+step 3:
+docker run --name wordpress02 --network p-network --link mysql02 -p 1111:80 -e WORDPRESS_DB_HOST=mysql02:3306 -e WORDPRESS_DB_USER=root -e WORDPRESS_DB_PASSWORD=Password1234 -e WORDPRESS_DB_NAME=wordpress -e WORDPRESS_TABLE_PREFIX=wp_ -d wordpress
+
+Note:It is added to same p-network , --link is used to link the container, def port 80 of mysql is exposed to 1111,
+       -e is used for environment variable.
+       instead of ip address we are using mysql container name,3306 is the port at which sql server is running, password1234 is provided to wordpress to connect to        mysql db, wordpress database will be created with the table name prefixed as wp_ , both the containers will start in detach mode because of -d
+
+step 4: test
+click the 1111 port
+select eng language-->complete the form ---> Install wordpress
+
+step 4:checking the tables are created in mysql. so lets move inside the mysql02 container.
+docker exec -it mysql02 bash
+mysql -uroot -pPassword1234
+show databases
+use wordpress;
+show tables;
+
+step 4: create a new post
+ query the user_post table
+ 
+
+exit;  ----------> comes out of the container
+
+Note: In docker toolbox you can use the ip of the container
+eg.
+http://192.168.0.23:1111
+or 
+http://localhost:1111
+When we do port forwardization we are making the image availaible to all.
+
+internally the containers know each other by name
+to make it globally (external)available should have a dns
+
+step 4: stop the running containers
+docker stop mysql02 wordpress02

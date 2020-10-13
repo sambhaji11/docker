@@ -3,7 +3,7 @@ session 1
 =====>Why Docker?
   What problem does Docker solve? 
 - Environment setup and management is a tedious task in every project.
-- Docker solves the problem of having identical environments across various stages of development and having isolated environments for your individual applications.
+- Docker solves the problem of having identical environments across various stages of development and having isolated environments for your individual applns.
 - Docker provides a solution to this problem with containerization.
 - Earlier, we used to create virtual machines, and each VM had an OS which took a lot of space and made it heavy.Now in docker container’s case, you have a single OS, and the resources are shared between the containers. 
 

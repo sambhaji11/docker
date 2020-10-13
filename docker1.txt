@@ -1,0 +1,271 @@
+session 1
+
+=====>Why Docker?
+  What problem does Docker solve? 
+- Environment setup and management is a tedious task in every project.
+- Docker solves the problem of having identical environments across various stages of development and having isolated environments for your individual applications.
+- Docker provides a solution to this problem with containerization.
+- Earlier, we used to create virtual machines, and each VM had an OS which took a lot of space and made it heavy.Now in docker container’s case, you have a single OS, and the resources are shared between the containers. 
+
+Learning Docker: 
+- Samples: https://docs.docker.com/samples/
+------------------------
+===>What is containerization?
+- Containerization means, that your application runs in an isolated container, that is an explicitly defined, reproducable and portable environment. 
+- A container of an app is the app’s operating environment in our computing scenario. With Docker you ship the operating environment along with your application.
+- One of the main benefits of using Docker, and container technology, is the portability of applications. It’s possible to spin up an application on-premises or in a public cloud environment in a matter of minutes.
+
+===>Containers vs Virtual Machines
+- Terms “Containers” and “Virtual Machines” are often used interchangeably, however, this is often a misunderstanding. But, both are just different methods to provide Operating System Virtualization.
+
+- Standard virtual machines:
+---------------------------
+-Virtualization is a technique of importing a guest os on the top of host os.
+- This technique is revolution in the beginning because Developers run the different application in different vms all running on same host whereas virtualization supported for a single server to run many standalone operating systems as virtual guests.
+- Include a full Operating System, OS Packages and if required, few applications. This is made possible by a Hypervisor which provides hardware virtualization to the virtual machine. 
+
+Host os=> Hypervisor=>(Guest os1,Guest os2....)=>(Bin& Lib, Bin & Lib 2.....)=>(App1,App2,.....)
+
+- They take a physical server and provide a fully functional operating environment that shares those physical resources with other virtual machines.
+- This eliminate the need of extra h/w resource and enable the backup allowing the the recovery in failure conditions
+
+---> Advantages
+
+   1.Multiple OS in the same machine
+   2.Easy Maintainance and Recovery
+   3.Lower total cost of Ownership
+
+---> Disadvantages
+
+   1.Multiple VMs Lead to unstable performance
+   2.Hypervisors are not as efficient as a host os
+   3.Long Boot up process (Approximate 1 minute)
+   4.This is using the host system resources
+   5.This is very critical in case of real time applications where fast processing is required. 
+   6.scaling the no of vms is tedious and costly affiar
+
+- Containers:
+---------------------------
+- Similar to virtual machines except that Containers are not full operating systems. They only include the necessary OS Packages and Applications.In other words, Contairnerization is Just Virtualization at OS Level 
+- They do not generally contain a full operating system or hardware virtualization, that’s why these are “lightweight”.Binaries and Libraries of the containers are on the host kernel which makes processing and execution very fast
+
+Host os=>Container Engine=>(Bin& Lib, Bin & Lib 2.....) =>(App1,App2)
+
+- They are used to isolate a running process within a single host to ensure that the isolated processes cannot interact with other processes within that same system. 
+- Containers sandbox processes from each other
+- Docker enables creating and working with Containers as easy as possible.
+
+- Virtualization brings the abstraction at h/w where as Contairnerization brings abstraction to software
+
+--->  Advantages
+
+	1.Containers on same os kernel are lighter and smaller
+	2.Better Resource utilization Compared to VMS
+	3.Short Boot up process (1/20th of second )
+
+---------------------------
+
+Which of the below option is incorrect ?
+
+1. Contairnerization  is replacing Virtualization 
+2. Contairnerization brings process level isolation
+3. Hypervisors Manage the VMS.
+
+2.What is  docker ?
+=====================
+Docker is a container management service.
+The keywords of Docker are develop, ship and run anywhere.
+The whole idea of Docker is for developers to easily develop applications, ship them into containers which can then be deployed anywhere.
+- Docker is a container management service.
+- The keywords of Docker are develop, ship and run anywhere.
+- The whole idea of Docker is for developers to easily develop applications, ship them into containers which can then be deployed anywhere.
+- It envelopes the application along with all other elements like external libraries and other such dependencies which are required to run the application into a single package smoothly.
+- It is an open source which means that anyone can add features and functionalities to meet their needs thus contribute towards the betterment of the tool.
+
+3.Features of Docker
+====================
+
+=>Docker has the ability to reduce the size of development by providing a smaller footprint of the operating system via containers.
+
+=>With containers, it becomes easier for teams across different units, such as development, QA and Operations to work seamlessly across applications.
+
+=>You can deploy Docker containers anywhere, on any physical and virtual machines and even on the cloud.
+
+=>Since Docker containers are pretty lightweight, they are very easily scalable.
+
+---------------------------
+===> Features of Docker
+- Docker has the ability to reduce the size of development by providing a smaller footprint of the operating system via containers.
+-With containers, it becomes easier for teams across different units, such as development, QA and Operations to work seamlessly across applications.
+-You can deploy Docker containers anywhere, on any physical and virtual machines and even on the cloud.
+-Since Docker containers are pretty lightweight, they are very easily scalable.
+
+===Common Docker Use Cases
+(1)Configuration Simplification: 
+- Docker can run on any platform with the help of its configuration without the actual overhead of a virtual machine.
+- It allows you to put the configuration file into the code and pass environment variables to cater to different environments. So that one docker image could be used in the different environment.
+
+(2)Code Management: The code travels through a different environment in its journey from development to production.
+- Each environment is having slight variation than the other. Docker eliminates this difference by providing a consistent environment, making the development and coding so much more comfortable.
+- Docker images being immutable they come with the advantage of having zero change in application environment from dev to production.
+
+(3)Improved Development Productivity: The two essential objectives in the development ecosystem, is to have the development environment replicate as close as possible to the production environment and next goal to get quality code delivered as soon as possible.
+- Docker allows the code to run in a container which reflects the production environment and unlike VM, docker has lesser overhead memory capacity wise which helps several services to run.
+
+(4)Isolation of Applications: There are cases where application isolation may be needed for example API servers which require different apache and a different set of dependencies.
+- Running API servers under different containers is much better way out.
+
+(5)Debugging Capabilities: Docker provides numerous tools that work well with containers, with the ability to insert checkpoints within containers and also different containers which are quite essential while testing applications.
+
+(6)Rapid Deployment: Docker containers can be created quite quickly which achieved as containers are not booting up an OS but just running the application.
+- Once set, they give you peace that once the code has worked, it will work in all environment.
+
+------------------------
+--->Docker Editions:Docker is available in two editions:
+(1)Community Edition (CE)
+(2)Enterprise Edition (EE)
+
+(1)Docker Community Edition (CE) is ideal for individual developers and small teams looking to get started with Docker and experimenting with container-based apps.
+
+(2)Docker Enterprise Edition (EE) is designed for enterprise development and IT teams who build, ship, and run business critical applications in production at scale.
+
+===> Docker installation methods
+- Generally, there are three main Docker installation methods, the choice of which depends on the situation and environment, as explained below.
+(1)Using the Docker repositories: – Easy to install and upgrade method recommended for most online installations.
+(2)Manual download, installation, and upgrades: – suitable for offline computers that have no access to internet
+(3)Using automated scripts: for development and testing environments.
+
+
+--->Installation using the Docker repositories
+(1)Docker for Mac - It allows one to run Docker containers on the Mac OS.
+(2)Docker for Linux - It allows one to run Docker containers on the Linux OS.
+(3)Docker for Windows - It allows one to run Docker containers on the Windows OS.
+
+-Docker Engine - It is used for building Docker images and creating Docker containers.
+-Docker Hub - This is the registry which is used to host various Docker images.
+-Docker Compose - This is used to define applications using multiple Docker containers.
+
+------------------------
+===>Installation of Docker on windows?
+- Refer this site :  https://docs.docker.com/toolbox/toolbox_install_windows/
+
+- For windows we need to download Docker toolbox.
+- To Check Installation: Open the Command Promt and check on the below mentined commands
+1.docker version  :shows the version of docker
+2.docker info     :gives the information of docker
+-----------------------
+Diff between docker toolbox and docker for windows
+I. Docker tool box installation gives you the below things
+1.Docker CE/EE
+2.Docker Compose
+3.Docker Machine: creates a VM . runs the lightweight Linux machine. 
+4.VirtualBox: loads linux on non linux os like windows and mac. because docker loads in linux os.It is type2hypervisor and runs on all major platforms
+5.Docker Quickstart terminal: creates a new server on docker maachine
+6.kitematic: graphical tool that manages images
+
+docker toolbox+docker machine==VirtualBox VM+docker installed
+The first 3 are specific to docker
+
+II. Docker for Windows/Mac
+--No Virttualbox required . It uses hypervisor 1 that comes coded with the OS
+   Windows uses Hyper-v
+   MacOS uses Hyperkit
+ It gives you below 3 things
+1.Docker CE/EE
+2.Docker Compose
+3.Docker Machine
+
+Docker Toolbox			Dockerfor Mac/win
+----------------		--------------------
+Need type 2 hypervisor		Need a type 1 hypervisor
+windows 7+(Home edition is ok)	Win 10(pro,Ent,stu)
+Docker deemon[remote]		docker deemon[local]
+access 192.168.99.199		Any terminal you want
+Might be faster			Might be slower
+------------------------
+
+Docker Basic Commands
+=====================
+
+Basic
+: docker version
+: docker -v 
+: docker --version 
+: docker info
+: docker --help
+: docker login
+
+————————————
+Images
+: docker images                        To list the images
+: docker images ls                     To list the images
+: docker pull                          To pull tha image
+: docker rmi                           To remove one or more iamges
+: docker rmi $(docker images -q)       To remove all images
+
+————————————
+Containers
+: docker ps                                                 shows only running cotainers(use -a for show all containers))
+: docker ps -a                                              shows all containers
+: docker rm <container-name>                                remove one or more containers
+: docker rm $(docker ps -a -q)                              remove all containers
+: docker run <image-name>                                   create a container from image (first time used to container)
+: docker run -d <image-name>                                create a container from image in detached mode
+: docker run -it <image-name> bash                          create a container from image in interactive mode terminal
+: docker start -i <container-name>                          To start the stoped container
+: docker stop <container-name>                              To stop running container
+: docker logs <container-name>                              To sess logs of contianer
+: docker exec -it <container-name> bash                     To interact with container
+: docker run --name a-centos -it centos bash                container will not be removed on exit
+: docker run --name b-centos --rm -it centos bash           container will be removed on exit
+  
+————————————
+System
+: docker stats
+: docker system df   ----> generated a summary for docker objects
+: docker system prune (to stop all running containers)
+-----------------------------------------------------------------------------------------------
+Online practice for docker:
+
+https://labs.play-with-docker.com/
+chhayanikam01
+
+===>Docker Basic Commands
+
+-Verify docker version installed on the machine
+: docker version
+: docker --version
+: docker -v
+
+- Verify docker Engine Set-Up and details
+: docker info
+
+- List all Docker commands
+docker
+
+: docker --help
+: docker login
+: docker ps
+: docker stats
+————————————
+To create a container from image only first time
+===================================================
+docker run --name a-centos -it centos 
+docker start a-centos
+docker stop a-centos
+docker rm a-centos
+docker logs a-centos
+docker ps
+docker ps -a
+docker exec -it a-centos bash
+docker rm $(docker ps -a -q)
+
+docker run --name a-centos -it centos bash
+
+docker run --name b-centos -it centos bash
+
+docker network inspect bridge
+
+docker exec -it a-centos bash
+
+# ping 172.17.0.3

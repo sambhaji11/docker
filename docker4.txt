@@ -1,0 +1,277 @@
+Networking contd...
+Ingress and Overlay Network
+
+overlay network:
+--The Overlay Network driver in Docker provides the ability to network containers across multiple Docker hosts in a cluster. 
+--The overlay network driver creates a distributed network among multiple Docker daemon hosts. This network sits on top of (overlays) the host-specific networks, allowing containers connected to it (including swarm service containers) to communicate securely when encryption is enabled.
+
+--> When to use overlay network
+Consider, you have multiple docker host running containers in which each docker host has its own internal private bridge network allowing the containers to communicate with each other however, containers across the host has no way to communicate with each other unless you publish the ports on those containers and set up some kind of routing yourself. 
+
+This is where overlay network comes into play. With docker swarm you can create an overlay network which will create an internal private network that spans across all the nodes participating in the swarm network we could attach a container or service to this network using the network option while creating a service. So, the containers across the nodes can communicate over this overlay network.
+----------------------------
+When you initialize a swarm or join a Docker host to an existing swarm, two new networks are created on that Docker host:
+
+an overlay network called ingress, which handles control and data traffic related to swarm services. When you create a swarm service and do not connect it to a user-defined overlay network, it connects to the ingress network by default.
+a bridge network called docker_gwbridge, which connects the individual Docker daemon to the other daemons participating in the swarm.
+
+Docker Swarm
+==============================
+A Docker Swarm is a group of either physical or virtual machines that are running the Docker application and that have been configured to join together in a cluster.
+Docker swarm is a container orchestration tool, meaning that it allows the user
+to manage multiple containers deployed across multiple host machines.
+
+--Introduction to Docker Swarm Architecture
+Docker Swarm is a clustering and Orchestration tool for Containers which is inbuilt in Docker Engine for the distributed system which involves hundreds of containers. Docker Node, Docker Services, and Docker tasks are key components of Docker swarm architecture.
+
+Docker Node: It is the Docker Engine instance included in Docker swarm, has  two kinds:
+Manager Node: Responsible for all orchestration and container management tasks required to maintain the system in the desired state such as maintaining the cluster state, scheduling the services and servicing the swarm mode HTTP endpoints.
+Docker Service: It is the task definition that needs to be executed.
+
+Node is the key member of docker swarm architecture, a swarm architecture can have more than one manager nodes lead by a single manager node elected using the Raft algorithm, a manager node can also work as a worker node but can be configured to work as manager node too.
+
+===>Work Flow of Docker Swarm
+The workflow of docker swarm consists of understanding how nodes and services work in a docker swarm architecture:
+
+Step 1: The first step is to create a set of docker-machine that will act as nodes in the docker swarm, one among these nodes will be the manager, the remaining node\s will act as worker nodes. 
+Step 2: The second step is to create worker machines,
+Step 3: Step three is to initialize the docker swarm, we have to run this command on the machine which we want work as a manager, that is how we make node manager, we can add more managers as well.
+
+docker swarm init –advertise-addr Manager1 IP
+Step 4: Step four is to join the worker nodes to swarm, get the command to join node as a worker using below command on manager machine and run the command you have got on the worker machine you want to make a worker.
+
+Docker swarm join-token worker1
+
+To Create Swarm Cluster
+=========================
+$ docker swarm init
+$ docker swarm init --advertise-addr=192.168.0.18
+
+-->from manager node, check the ingress network created type of driver is overlay
+$docker network ls
+
+Swarm initialized: current node (fe9nz97mhl4pasmewsyjczlqb) is now a manager.
+To add a worker to this swarm, run the following command:
+
+docker swarm join --token SWMTKN-1-0k8cln5ifhaw9bqtjzwdvlptpgt7yollbhbrb0iecpb3no8yd9-0qdpx13zctp93enffe9si4im1 192.168.0.18:2377
+
+To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+
+[node1] (local) root@192.168.0.18 ~
+$ 
+
+--> confirm that node is added as the worker node,on manager node
+docker node ls
+
+Make all the other nodes as the worker node.
+--> confirm that node is added as the worker node,on manager node
+docker node ls
+-------------------------------------------------------------------------------
+Manage Swarm nodes
+================
+Commands:
+  demote      Demote one or more nodes from manager in the swarm
+  inspect     Display detailed information on one or more nodes
+  ls          List nodes in the swarm
+  promote     Promote one or more nodes to manager in the swarm
+  ps          List tasks running on one or more nodes, defaults to current node
+  rm          Remove one or more nodes from the swarm
+  update      Update a node
+
+eg1:Make node2 and node3 managers
+docker node promote node2 node3
+node 2--> docker node ls
+node 3--> docker node ls
+
+eg2:removing a node from manager
+$ docker node demote node3
+Manager node3 demoted in the swarm.
+
+eg3:getting the node info
+Note: must begiven only from manager node
+docker node inspect node2
+
+eg4:list the containers running on current node
+docker node ps
+
+eg5:list the containers running on another node
+docker node ps node3
+
+eg6:remove a node from the swarm
+
+docker node rm node3
+
+Manage Swarm
+=============
+
+Commands:
+  ca          Display and rotate the root CA
+  init        Initialize a swarm
+  join        Join a swarm as a node and/or manager
+  join-token  Manage join tokens
+  leave       Leave the swarm
+  update      Update the swarm
+
+Manage services
+=================
+
+Commands:
+  create      Create a new service
+  inspect     Display detailed information on one or more services
+  logs        Fetch the logs of a service or task
+  ls          List services
+  ps          List the tasks of one or more services
+  rm          Remove one or more services
+  rollback    Revert changes to a service's configuration
+  scale       Scale one or multiple replicated services
+  update      Update a service
+-----------------------------------------------------------------------------
+docker run --name a-nginx -p 1111:80 -d nginx
+docker run --name b-nginx -p 2222:80 -d nginx
+docker run --name c-nginx -p 3333:80 -d nginx
+
+Here , for creating 100 containers we need to have 100 different ports.
+This problem can be solved by creating service.
+
+-->Must be running on manager node
+$docker service create --replicas 5 --name p-nginx -p 1111:80 nginx
+or
+$docker service create --replicas 5 --name p-nginx -publish 1111:80 nginx
+
+--> to check the containers are created
+docker node ls
+docker node ls node2
+docker node ls node3
+
+--Note that all containers can be accessed only through one port, which is not possible with bridge network.
+--Also does auto scaling.
+--Automatically does the load balancing.
+
+-->Now you can list the service 
+docker service ls
+
+--> see all the containers running on which node
+docker service ps p-nginx
+
+--> Now lets try removing a container created by service
+--> before removing the container must be stopped
+first get the containerid --->node1--->docker ps
+then stop the running container-->node 1--> docker stop <containerid>
+-->docker service ps p-nginx
+
+Note : the stopped container are immediately created again on node1. 
+Always the given number of replicas will always be available.
+At any point of time thegiven number of replicas must be available. This ensures the availaibilty of the node.
+
+Demo 2: Checking the load balancing and availaibilty
+https://cloud.docker.com/repository/list
+Manager node--->
+docker service create --name my-cafe --replicas 10 --publish 5555:80 chhayanikam01/p-cafe
+docker service ps my-cafe
+
+Now lets say due to some reason node3 is deleted.So even if any node is down the instances are balanced.
+manager -->docker service ps my-cafe
+
+--leave the node from the swarm cluster
+docker swarm leave
+docker node rm <nodename>
+
+
+node 1--> docker network ls
+The ingress network with same id is avbl on all nodes.
+docker_gwbridge is a local network on each node with a different Id on each node.
+
+node 1---> docker inspect network ingress
+Note : the containers added
+
+node 2---> docker inspect network ingress
+Note : the containers added
+
+--service update for the number of replicas
+docker service update --replicas 5 my-cafe
+docker service update --replicas 15 my-cafe
+
+--service update for image version
+docker service update --image chhyanikam01/p-cafe:1.2 p-tea
+
+--port updation
+docker service update --publish-add published=4444,target=80 my-cafe
+
+----------------------------------------------------------------------------
+Stack
+=====
+--Docker Compose and Docker Stack can both be controlled by a docker-compose.yml file
+--Are used for managing services
+--Docker Compose is an official tool that helps you manage your Docker containers by letting you define everything through a docker-compose.yml file.
+--docker stack is a command that’s embedded into the Docker CLI. It lets you manage a cluster of Docker containers through Docker Swarm.
+
+Manage Docker stacks
+
+Options:
+      --orchestrator string   Orchestrator to use (swarm|kubernetes|all)
+
+Commands:
+  deploy      Deploy a new stack or update an existing stack
+  ls          List stacks
+  ps          List the tasks in the stack
+  rm          Remove one or more stacks
+  services    List the services in the stack
+
+Requirement:We want to start the multiple services but not one by one.
+--create the swarm node cluster of 3 node1,node2,node3
+docker swarm init --advertise-addr=192.168.0.18
+docker node promote node2 node3
+docker node ls
+
+And all are managers
+This yml will create only one one container for each service.
+--node1 --> vi docker-compose.yml
+
+version: '3.3'
+
+services:
+   database:
+     image: pradeepch82/ems-mysql:1.1
+     volumes:
+       - db_data:/var/lib/mysql
+     restart: always
+   ems-spring-boot:
+     depends_on:
+       - database
+     image: pradeepch82/pvc-spring-boot-ems:1.2
+     ports:
+       - "1212:8080"
+     restart: always
+     
+volumes:
+    db_data: {}
+
+==> next check the validity of the yml file
+docker-compose config
+
+==>deploy to stack
+docker stack deploy --compose-file docker-compose.yml spring-boot-mysql-stack
+
+Note the services created:2
+
+docker stack ls
+
+docker stack services spring-boot-mysql-stack
+
+Note : The stack can create the services on any node
+--check the logs on each node, both for databases and spring
+docker ps
+docker logs <containerid>
+
+--to run the application click 1212 and also add the context path else u get 404
+http://ip172-18-0-158-bst7uatim9m000audu5g-1212.direct.labs.play-with-docker.com/springboot-ems-app/
+
+--add and edit some records using ui form
+
+--check the db created
+docker exec -it <mysqlcontainerid> bash
+
+mysql -uroot -padmin
+------------------------------------------------
+--> To check the syntax and all commands
+docker stack deploy --help
